@@ -4,19 +4,15 @@
 1. Install Python 3
 1. Install pip - ```py -m ensurepip --upgrade```
 1. Install prerequisites - ```python .\prereq.py```
-1. Download xrecode3 command line version and extract in a xrecode folder beside the python files.
+1. Download [ffmpeg](https://github.com/BtbN/FFmpeg-Builds/releases) and extract atleast the bin folder to a ffmpeg folder where the python files are.
 
-### Folderstructure shoul look like this:
+### Folder structure should atleast look like this:
 ```
 ytMusicLoader/
-├── xrecode/
+├── ffmpeg/
 │   ├── bin/
-|   |    ├── ...
-│   ├── portable/
-|   |    ├── ...
-│   ├── stuff/
-|   |    ├── ...
-│   └── xrecode3cx64.exe
+|   |    ├── ffmpeg.exe
+│   └── ...
 ├── download.py
 ├── playlists.txt
 └── prereq.py
@@ -35,3 +31,4 @@ Just tested with music.youtube.com and urls with ```...playlist?list=....```
 * [pytube](https://github.com/pytube/pytube)
 * [musicbrainzngs](https://github.com/alastair/python-musicbrainzngs)
 * [mutagen](https://github.com/quodlibet/mutagen)
+* [FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds/releases)

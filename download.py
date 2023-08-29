@@ -7,6 +7,7 @@ from difflib import SequenceMatcher
 import os
 from mutagen.flac import FLAC
 import re
+import threading
 
 proxy = 'http://10.54.32.50:8080'
 os.environ['http_proxy'] = proxy 
@@ -14,7 +15,9 @@ os.environ['HTTP_PROXY'] = proxy
 os.environ['https_proxy'] = proxy
 os.environ['HTTPS_PROXY'] = proxy
 
+
 path = pathlib.Path(__file__).parent.resolve()
+
 urls = []
 if len(sys.argv) > 1:
     for arg in sys.argv:
@@ -29,6 +32,11 @@ print(urls)
 special_characters=['<','>',':','|','&','(',')','*','\\','/', '?', '\"']
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
+
+def encode(param, name, inputfile):
+    print("Start encoding ", name)
+    subprocess.call(param)
+    os.remove(inputfile)
 
 for url in urls:
     print(url)
@@ -46,13 +54,23 @@ for url in urls:
         album_path = "".join(c for c in album if c not in special_characters) 
         author_path = "".join(c for c in yt.author if c not in special_characters)
         outpath = str(path) + "\\" + author_path + "\\" +  album_path
-        yt.streams.get_by_itag(251).download(output_path=outpath)
+        #yt.streams.get_by_itag(251).download(output_path=outpath)
     print("----------------------------------------------------------------------------------")
     print("    Encoding *.webm files to .flac with max. compression.")
     print("    ")
     print("----------------------------------------------------------------------------------")
-    xrecodeargs = str(path)+"\\xrecode\\xrecode3cx64.exe " +"-i \"" + outpath + "\\*.webm\" /r -o \"" + outpath + "\" /dest flac /compression 8 /delete"
-    subprocess.call(xrecodeargs)
+    threads = list()
+    for file_path in os.listdir(outpath):
+        if os.path.isfile(os.path.join(outpath, file_path)) and file_path.endswith("webm"):
+            subpr = "ffmpeg -i \"" + outpath + "\\" + file_path + "\" -f flac -sample_fmt s16 -ar 48000 -compression_level 12 -loglevel quiet \"" + outpath + "\\" + file_path.replace(".webm", ".flac") +"\""
+            thread = threading.Thread(target=encode, args=(subpr, file_path, outpath + "\\" + file_path, ))
+            threads.append(thread)
+            thread.start()
+    for x in threads:
+        x.join()
+    print("Encoding done.")
+    #xrecodeargs = str(path)+"\\xrecode\\xrecode3cx64.exe " +"-i \"" + outpath + "\\*.webm\" /r -o \"" + outpath + "\" /dest flac /compression 8 /delete"
+    #subprocess.call(xrecodeargs)
 
     print("----------------------------------------------------------------------------------")
     print("    Getting MusicBrainz album information.")
