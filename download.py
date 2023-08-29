@@ -9,11 +9,13 @@ from mutagen.flac import FLAC
 import re
 import threading
 
-proxy = 'http://10.54.32.50:8080'
-os.environ['http_proxy'] = proxy 
-os.environ['HTTP_PROXY'] = proxy
-os.environ['https_proxy'] = proxy
-os.environ['HTTPS_PROXY'] = proxy
+
+# If proxy is used uncomment this
+#proxy = 'http://1.2.3.4:80'
+#os.environ['http_proxy'] = proxy 
+#os.environ['HTTP_PROXY'] = proxy
+#os.environ['https_proxy'] = proxy
+#os.environ['HTTPS_PROXY'] = proxy
 
 
 path = pathlib.Path(__file__).parent.resolve()
@@ -54,7 +56,7 @@ for url in urls:
         album_path = "".join(c for c in album if c not in special_characters) 
         author_path = "".join(c for c in yt.author if c not in special_characters)
         outpath = str(path) + "\\" + author_path + "\\" +  album_path
-        #yt.streams.get_by_itag(251).download(output_path=outpath)
+        yt.streams.get_by_itag(251).download(output_path=outpath)
     print("----------------------------------------------------------------------------------")
     print("    Encoding *.webm files to .flac with max. compression.")
     print("    ")
