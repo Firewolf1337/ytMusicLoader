@@ -64,7 +64,7 @@ for url in urls:
     threads = list()
     for file_path in os.listdir(outpath):
         if os.path.isfile(os.path.join(outpath, file_path)) and file_path.endswith("webm"):
-            subpr = "ffmpeg -i \"" + outpath + "\\" + file_path + "\" -f flac -sample_fmt s16 -ar 48000 -compression_level 12 -loglevel quiet \"" + outpath + "\\" + file_path.replace(".webm", ".flac") +"\""
+            subpr = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe -i \"" + outpath + "\\" + file_path + "\" -f flac -sample_fmt s16 -ar 48000 -compression_level 12 -loglevel quiet \"" + outpath + "\\" + file_path.replace(".webm", ".flac") +"\""
             thread = threading.Thread(target=encode, args=(subpr, file_path, outpath + "\\" + file_path, ))
             threads.append(thread)
             thread.start()
