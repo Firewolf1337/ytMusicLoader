@@ -6,9 +6,15 @@ import musicbrainzngs as mbz
 from difflib import SequenceMatcher
 import os
 from mutagen.flac import FLAC
+from mutagen.easyid3 import EasyID3
 import re
 import threading
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--links', '-l', help="Playlist links. Can be whitespace seperated", type= str)
+parser.add_argument('--format', '-f', help="Output format. Possible arguments mp3 or flac", type= str, default= "flac")
+args = parser.parse_args()
 
 # If proxy is used uncomment this
 #proxy = 'http://1.2.3.4:80'
@@ -19,17 +25,31 @@ import threading
 
 
 path = pathlib.Path(__file__).parent.resolve()
-
 urls = []
-if len(sys.argv) > 1:
-    for arg in sys.argv:
-        if arg.startswith("http"):
-            urls.append(arg)
+fileext = ""
+outformat= ""
+if args.links != None:
+    urls = args.links.split(" ")
 else:
     with open(str(path) + '\\playlists.txt', "r") as Playlists:
         urls = Playlists.readlines()
 
-print(urls)
+
+def switch(format):
+    global fileext
+    global outformat
+    if format == "mp3":
+        fileext = ".mp3"
+        outformat =  "-f mp3 -ac 2 -b:a 320k -loglevel quiet"
+    elif format == "flac":
+        fileext = ".flac"
+        outformat =  "-f flac -sample_fmt s16 -ar 48000 -compression_level 12 -loglevel quiet"
+        
+
+switch(args.format)
+#print(fileext)
+#print(outformat)
+#print(urls)
 
 special_characters=['<','>',':','|','&','(',')','*','\\','/', '?', '\"']
 def similar(a, b):
@@ -41,7 +61,7 @@ def encode(param, name, inputfile):
     os.remove(inputfile)
 
 for url in urls:
-    print(url)
+    #print(url)
     p = Playlist(url=url)
     album = (p.title).replace('Album - ', '')
     artist = (p.videos[0]).author
@@ -58,13 +78,13 @@ for url in urls:
         outpath = str(path) + "\\" + author_path + "\\" +  album_path
         yt.streams.get_by_itag(251).download(output_path=outpath)
     print("----------------------------------------------------------------------------------")
-    print("    Encoding *.webm files to .flac with max. compression.")
+    print("    Encoding *.webm files to " + args.format + ".")
     print("    ")
     print("----------------------------------------------------------------------------------")
     threads = list()
     for file_path in os.listdir(outpath):
         if os.path.isfile(os.path.join(outpath, file_path)) and file_path.endswith("webm"):
-            subpr = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe -i \"" + outpath + "\\" + file_path + "\" -f flac -sample_fmt s16 -ar 48000 -compression_level 12 -loglevel quiet \"" + outpath + "\\" + file_path.replace(".webm", ".flac") +"\""
+            subpr = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe -i \"" + outpath + "\\" + file_path + "\" "+ outformat + " \"" + outpath + "\\" + file_path.replace(".webm", fileext) +"\""
             thread = threading.Thread(target=encode, args=(subpr, file_path, outpath + "\\" + file_path, ))
             threads.append(thread)
             thread.start()
@@ -118,21 +138,26 @@ for url in urls:
     files =[]
     for file_path in os.listdir(outpath):
         if os.path.isfile(os.path.join(outpath, file_path)):
-            if file_path.split(sep=".")[1] == "flac":
+            if file_path.split(sep=".")[1] == fileext.replace(".",""):
                 files.append(file_path)
     for track in medium:
         print(track['position'] + ". " + track['recording']['title'])
         for file in files:
             if similar(file.split(sep=".")[0], track['recording']['title']) > 0.8:
                 print("     Matching file found " + str(similar(file.split(sep=".")[0], track['recording']['title'])*100) + "%")
-                audio = FLAC(outpath + "\\" + file)
+                if fileext == ".mp3":
+                    audio = EasyID3(outpath + "\\" + file)
+                    audio['date'] = date_meta.split("-")[0]
+                elif fileext == ".flac":
+                    audio = FLAC(outpath + "\\" + file)
+                    audio['year'] = date_meta.split("-")[0]
                 audio['title'] = track['recording']['title']
                 audio['artist'] = artist_meta
                 audio['album'] = album_meta
                 audio['genre'] = genre_meta
-                audio['year'] = date_meta.split("-")[0]
                 audio['Tracknumber'] = track['position']
                 audio.save()
+                    
     print("----------------------------------------------------------------------------------")
     print("    Done.")
     print("    ")
