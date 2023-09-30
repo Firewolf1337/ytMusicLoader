@@ -25,13 +25,15 @@ Either run - ```py .\download.py -l https://music.youtube.com/playlist?list=XXXX
 or put the link in the playlists.txt and just run ```py .\download.py```  
 **_For multiple link downloads put the links behind```.\download.py -l``` seperated by a whitespace and surroundet by quotes or put every link in a new line in the playlists.txt._** 
 
-```usage: download.py [-h] [--links LINKS] [--format FORMAT]
+```
+usage: download.py [-h] [--links LINKS] [--format FORMAT]
 optional arguments:
   -h, --help            show this help message and exit
   --links LINKS, -l LINKS
                         Playlist links. Can be whitespace seperated
   --format FORMAT, -f FORMAT
-                        Output format. Possible arguments mp3 or flac```
+                        Output format. Possible arguments mp3 or flac
+```
 
 ### Note:
 Just tested with music.youtube.com and urls with ```...playlist?list=....```
@@ -40,13 +42,15 @@ Just tested with music.youtube.com and urls with ```...playlist?list=....```
 run - ```py .\searchPlaylist.py -a "Artist Name" -w a```  
 this will search for all released albums of an artist and append the list of playlists in playlists.txt
 
-```usage: searchPlaylist.py [-h] [--artist ARTIST] [--writemode {a,w}]
+```
+usage: searchPlaylist.py [-h] [--artist ARTIST] [--writemode {a,w}]
 optional arguments:
   -h, --help            show this help message and exit
   --artist ARTIST, -a ARTIST
                         Name of the Artist to search for the albums
   --writemode {a,w}, -w {a,w}
-                        Append or overwrite the existing Playlist.txt - Options a for append or w for overwrite```
+                        Append or overwrite the existing Playlist.txt - Options a for append or w for overwrite
+```
 
 ## Thanks going to:
 **To all contributers at:**
