@@ -5,15 +5,13 @@ import subprocess
 import musicbrainzngs as mbz 
 from difflib import SequenceMatcher
 import os
-from mutagen.flac import FLAC
-from mutagen.easyid3 import EasyID3
-import re
 import threading
 import argparse
+from typing import Dict
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--links', '-l', help="Playlist links. Can be whitespace seperated", type= str)
-parser.add_argument('--format', '-f', help="Output format. Possible arguments mp3 or flac", type= str, default= "flac")
+parser.add_argument('--format', '-f', help="Output format. Possible arguments none, mp3 or flac", type= str, default= "mp3", choices=['flac', 'mp3', 'none'])
 args = parser.parse_args()
 
 # If proxy is used uncomment this
@@ -34,6 +32,32 @@ else:
     with open(str(path) + '\\playlists.txt', "r") as Playlists:
         urls = Playlists.readlines()
 
+def add_metadata(file: pathlib.Path,
+                 meta: Dict[str, str],
+                 save_path: pathlib.Path = None,
+                 overwrite: bool = True):
+    if not save_path:
+        save_path = file.with_suffix('.metadata' + file.suffix)
+
+    metadata_args = []
+    for k, v in meta.items():
+        metadata_args.extend([
+            '-metadata', f'{k}={v}'
+        ])
+
+    args = [
+        str(pathlib.Path(__file__).parent.resolve()) + '\\ffmpeg\\bin\\ffmpeg.exe',
+        '-v', 'quiet',
+        '-i', str(file.absolute()),
+        *metadata_args,
+        '-c', 'copy',
+        str(save_path)
+    ]
+    if overwrite:
+        args.append('-y')
+    proc = subprocess.run(args, stdout=subprocess.PIPE)
+    proc.check_returncode()
+    os.remove(file)
 
 def switch(format):
     global fileext
@@ -44,12 +68,11 @@ def switch(format):
     elif format == "flac":
         fileext = ".flac"
         outformat =  "-f flac -sample_fmt s16 -ar 48000 -compression_level 12 -loglevel quiet"
-        
+    elif format == "none":
+        fileext = ".webm"
+        outformat = "none"
 
 switch(args.format)
-#print(fileext)
-#print(outformat)
-#print(urls)
 
 special_characters=['<','>',':','|','&','(',')','*','\\','/', '?', '\"']
 def similar(a, b):
@@ -77,22 +100,23 @@ for url in urls:
         author_path = "".join(c for c in yt.author if c not in special_characters)
         outpath = str(path) + "\\" + author_path + "\\" +  album_path
         yt.streams.get_by_itag(251).download(output_path=outpath)
-    print("----------------------------------------------------------------------------------")
-    print("    Encoding *.webm files to " + args.format + ".")
-    print("    ")
-    print("----------------------------------------------------------------------------------")
-    threads = list()
-    for file_path in os.listdir(outpath):
-        if os.path.isfile(os.path.join(outpath, file_path)) and file_path.endswith("webm"):
-            subpr = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe -i \"" + outpath + "\\" + file_path + "\" "+ outformat + " \"" + outpath + "\\" + file_path.replace(".webm", fileext) +"\""
-            thread = threading.Thread(target=encode, args=(subpr, file_path, outpath + "\\" + file_path, ))
-            threads.append(thread)
-            thread.start()
-    for x in threads:
-        x.join()
-    print("Encoding done.")
-    #xrecodeargs = str(path)+"\\xrecode\\xrecode3cx64.exe " +"-i \"" + outpath + "\\*.webm\" /r -o \"" + outpath + "\" /dest flac /compression 8 /delete"
-    #subprocess.call(xrecodeargs)
+    
+    if outformat != "none":
+        print("----------------------------------------------------------------------------------")
+        print("    Encoding *.webm files to " + args.format + ".")
+        print("    ")
+        print("----------------------------------------------------------------------------------")
+
+        threads = list()
+        for file_path in os.listdir(outpath):
+            if os.path.isfile(os.path.join(outpath, file_path)) and file_path.endswith("webm"):
+                subpr = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe -i \"" + outpath + "\\" + file_path + "\" "+ outformat + " \"" + outpath + "\\" + file_path.replace(".webm", fileext) +"\""
+                thread = threading.Thread(target=encode, args=(subpr, file_path, outpath + "\\" + file_path, ))
+                threads.append(thread)
+                thread.start()
+        for x in threads:
+            x.join()
+        print("Encoding done.")
 
     print("----------------------------------------------------------------------------------")
     print("    Getting MusicBrainz album information.")
@@ -145,19 +169,22 @@ for url in urls:
         for file in files:
             if similar(file.split(sep=".")[0], track['recording']['title']) > 0.8:
                 print("     Matching file found " + str(similar(file.split(sep=".")[0], track['recording']['title'])*100) + "%")
-                if fileext == ".mp3":
-                    audio = EasyID3(outpath + "\\" + file)
-                    audio['date'] = date_meta.split("-")[0]
-                elif fileext == ".flac":
-                    audio = FLAC(outpath + "\\" + file)
-                    audio['year'] = date_meta.split("-")[0]
-                audio['title'] = track['recording']['title']
-                audio['artist'] = artist_meta
-                audio['album'] = album_meta
-                audio['genre'] = genre_meta
-                audio['Tracknumber'] = track['position']
-                audio.save()
-                    
+                f = pathlib.Path(outpath+ "\\" + file)
+                add_metadata(
+                    f,
+                    meta=dict(
+                        title=track['recording']['title'],
+                        artist=artist_meta,
+                        album=album_meta,
+                        genre=genre_meta,
+                        year=date_meta.split("-")[0],
+                        date=date_meta.split("-")[0],
+                        track=track['position'],
+                        Tracknumber=track['position'],
+                    ),
+                    overwrite=True,
+                    save_path=outpath + "\\" + track['position'] + " - " + artist_meta  + " - " + album_meta + " - " + track['recording']['title'] + f.suffix
+                )                    
     print("----------------------------------------------------------------------------------")
     print("    Done.")
     print("    ")
