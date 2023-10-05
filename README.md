@@ -24,6 +24,7 @@ ytMusicLoader/
 Either run - ```py .\download.py -l https://music.youtube.com/playlist?list=XXXXXX -f mp3```  
 or put the link in the playlists.txt and just run ```py .\download.py```  
 Format can be as is [none], mp3 or flac.
+
 **_For multiple link downloads put the links behind```.\download.py -l``` seperated by a whitespace and surroundet by quotes or put every link in a new line in the playlists.txt._** 
 
 ```
@@ -58,4 +59,4 @@ optional arguments:
 * [pytube](https://github.com/pytube/pytube)
 * [musicbrainzngs](https://github.com/alastair/python-musicbrainzngs)
 * [FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds/releases)
-* [ytmusicapi] (https://github.com/sigma67/ytmusicapi)
+* [ytmusicapi](https://github.com/sigma67/ytmusicapi)
