@@ -27,8 +27,13 @@ for art in search_results:
     album = ytmusic.get_album(art['browseId'])
 
     if album['type'] == "Album":
-        print(album['title'] + " from Year " + str(album['year']) + " with " + str(album['trackCount']) + " Songs")
-        albumPlaylistIds.append(ytmusic.get_album(art['browseId'])['audioPlaylistId'])
+        released = True
+        for track in album['tracks']:
+            if not track['isAvailable']:
+                released = False
+        if released:
+            print(album['title'] + " from Year " + str(album['year']) + " with " + str(album['trackCount']) + " Songs")
+            albumPlaylistIds.append(ytmusic.get_album(art['browseId'])['audioPlaylistId'])
 with open(str(path) + '\\playlists.txt', args.writemode) as Playlists:
     for id in albumPlaylistIds:
         Playlists.write("https://music.youtube.com/playlist?list=" + id + "\n")
