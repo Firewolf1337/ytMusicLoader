@@ -12,7 +12,7 @@ def index():
     return render_template('index.html')
 
 def run_search(search_text):
-    command = ["python", "searchPlaylist.py", "-w", "w", "-a", search_text]
+    command = ["py", "searchPlaylist.py", "-w", "w", "-a", search_text]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
 
     for line in process.stdout:
@@ -21,7 +21,7 @@ def run_search(search_text):
     process.wait()
 
 def run_download():
-    command = ["python", "download.py"]
+    command = ["py", "download.py"]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
 
     for line in process.stdout:
