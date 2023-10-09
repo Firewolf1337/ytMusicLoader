@@ -32,6 +32,10 @@ else:
     with open(str(path) + '\\playlists.txt', "r") as Playlists:
         urls = Playlists.readlines()
 
+ffmpegpath = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe " 
+if subprocess.getstatusoutput('ffmpeg')[0] == 1:
+    ffmpegpath = "ffmpeg "
+
 def add_metadata(file: pathlib.Path,
                  meta: Dict[str, str],
                  save_path: pathlib.Path = None,
@@ -46,7 +50,7 @@ def add_metadata(file: pathlib.Path,
         ])
 
     args = [
-        str(pathlib.Path(__file__).parent.resolve()) + '\\ffmpeg\\bin\\ffmpeg.exe',
+        ffmpegpath,
         '-v', 'quiet',
         '-i', str(file.absolute()),
         *metadata_args,
@@ -95,12 +99,13 @@ for url in urls:
     counter = 0
     for yt in p.videos:
         counter = counter + 1
-        print("Loading \"" + yt.title + "\" " + str(counter) + "/" + str(p.length))
+        print("Loading \"" + str(yt.title) + "\" " + str(counter) + "/" + str(p.length))
         album_path = "".join(c for c in album if c not in special_characters) 
         author_path = "".join(c for c in yt.author if c not in special_characters)
         outpath = str(path) + "\\" + author_path + "\\" +  album_path
         yt.streams.get_by_itag(251).download(output_path=outpath)
-    
+    if counter < p.length:
+        continue
     if outformat != "none":
         print("----------------------------------------------------------------------------------")
         print("    Encoding *.webm files to " + args.format + ".")
@@ -110,7 +115,7 @@ for url in urls:
         threads = list()
         for file_path in os.listdir(outpath):
             if os.path.isfile(os.path.join(outpath, file_path)) and file_path.endswith("webm"):
-                subpr = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe -i \"" + outpath + "\\" + file_path + "\" "+ outformat + " \"" + outpath + "\\" + file_path.replace(".webm", fileext) +"\""
+                subpr = ffmpegpath +  "-i \"" + outpath + "\\" + file_path + "\" "+ outformat + " \"" + outpath + "\\" + file_path.replace(".webm", fileext) +"\""
                 thread = threading.Thread(target=encode, args=(subpr, file_path, outpath + "\\" + file_path, ))
                 threads.append(thread)
                 thread.start()
