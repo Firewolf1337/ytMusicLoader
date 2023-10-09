@@ -5,6 +5,7 @@
 1. Install pip - ```py -m ensurepip --upgrade```
 1. Install prerequisites - ```py .\prereq.py```
 1. Download [ffmpeg](https://github.com/BtbN/FFmpeg-Builds/releases) and extract atleast the bin folder to a ffmpeg folder where the python files are.
+1. Or just install it and make sure it is available in the cmd otherwise add it to $PATH 
 
 ### Folder structure should atleast look like this:
 ```
@@ -13,10 +14,13 @@ ytMusicLoader/
 │   ├── bin/
 |   |    ├── ffmpeg.exe
 │   └── ...
+├── templates/
+│   └── index.html
 ├── download.py
 ├── playlists.txt
-└── prereq.py
-└── searchPlaylist.py
+├── prereq.py
+├── searchPlaylist.py
+└── server.py
 ```
 
 
@@ -55,15 +59,17 @@ optional arguments:
 ```
 
 ### Website interface:
-run - ```py .\server.py```
-no need to handle any other commands beside this. Just run this and open the local website [http://127.0.0.1:5000](http://127.0.0.1:5000)
-Put in the name of the artist in the text field. 
-Click on "Fetch Playlists". This is overwriting so only one Artist at a time is possible.
-After seeing the list of found albums, just click "Download" and relax. The script output will be shown on the website.
+run - ```py .\server.py```  
+no need to handle any other commands beside this. Just run this and open the local website [http://127.0.0.1:5000](http://127.0.0.1:5000)  
+Put in the name of the artist in the text field.  
+Click on "Fetch Playlists". This is overwriting so only one Artist at a time is possible.  
+After seeing the list of found albums, just click "Download" and relax. The script output will be shown on the website.  
 
-## Thanks going to:
+## Thanks to:
 **all contributers at:**
 * [pytube](https://github.com/pytube/pytube)
 * [musicbrainzngs](https://github.com/alastair/python-musicbrainzngs)
 * [FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds/releases)
 * [ytmusicapi](https://github.com/sigma67/ytmusicapi)
+* [flask](https://github.com/pallets/flask)
+* [flask-socketio](https://github.com/miguelgrinberg/Flask-SocketIO)
