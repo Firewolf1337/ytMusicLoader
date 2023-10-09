@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ytMusicLoader</title>
+</head>
+<body>
+    <h1>ytMusicLoader</h1>
+    
+    <form>
+        <label for="search_text">Enter artist name to search album playlists:</label>
+        <input type="text" id="search_text" name="search_text">
+        <button type="button" onclick="runSearch()">Fetsch Playlists</button>
+    </form>
+    
+    <button type="button" onclick="runDownload()">Download</button>
+    
+
+    <h2>Output:</h2>
+    <pre id="output"></pre>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const outputElement = document.getElementById("output");
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
+    
+        socket.on('output', function(data) {
+            const outputLine = document.createElement("div");
+            outputLine.textContent = data;
+            outputElement.appendChild(outputLine);
+        });
+    
+        function runSearch() {
+            clearOutput();
+            const searchText = document.getElementById("search_text").value;
+            socket.emit('run_search', { search_text: searchText });
+        }
+    
+        function runDownload() {
+            clearOutput();
+            socket.emit('run_download');
+        }
+
+        function clearOutput() {
+            outputElement.innerHTML = ""; // Clear the content of the <pre> element
+            }
+    </script>
+</body>
+</html>

@@ -54,6 +54,13 @@ optional arguments:
                         Append or overwrite the existing Playlist.txt - Options a for append or w for overwrite
 ```
 
+### Website interface:
+run - ```py .\server.py```
+no need to handle any other commands beside this. Just run this and open the local website [http://127.0.0.1:5000](http://127.0.0.1:5000)
+Put in the name of the artist in the text field. 
+Click on "Fetch Playlists". This is overwriting so only one Artist at a time is possible.
+After seeing the list of found albums, just click "Download" and relax. The script output will be shown on the website.
+
 ## Thanks going to:
 **all contributers at:**
 * [pytube](https://github.com/pytube/pytube)

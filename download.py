@@ -15,11 +15,11 @@ parser.add_argument('--format', '-f', help="Output format. Possible arguments no
 args = parser.parse_args()
 
 # If proxy is used uncomment this
-#proxy = 'http://1.2.3.4:80'
-#os.environ['http_proxy'] = proxy 
-#os.environ['HTTP_PROXY'] = proxy
-#os.environ['https_proxy'] = proxy
-#os.environ['HTTPS_PROXY'] = proxy
+proxy = 'http://10.54.32.50:8080'
+os.environ['http_proxy'] = proxy 
+os.environ['HTTP_PROXY'] = proxy
+os.environ['https_proxy'] = proxy
+os.environ['HTTPS_PROXY'] = proxy
 
 
 path = pathlib.Path(__file__).parent.resolve()
@@ -83,34 +83,37 @@ def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
 def encode(param, name, inputfile):
-    print("Start encoding ", name)
+    print("Start encoding ", name, flush=True)
     subprocess.call(param)
     os.remove(inputfile)
 
 for url in urls:
-    #print(url)
     p = Playlist(url=url)
     album = (p.title).replace('Album - ', '')
     artist = (p.videos[0]).author
-    print("##################################################################################")
-    print("    Downloading " + album + " from " + artist)
-    print("    to \"" +  str(path) + "\\" + artist + "\\" + album + "\"")
-    print("----------------------------------------------------------------------------------")
+    print("##################################################################################", flush=True)
+    print("    Downloading " + album + " from " + artist, flush=True)
+    print("    to \"" +  str(path) + "\\" + artist + "\\" + album + "\"", flush=True)
+    print("----------------------------------------------------------------------------------", flush=True)
     counter = 0
     for yt in p.videos:
         counter = counter + 1
-        print("Loading \"" + str(yt.title) + "\" " + str(counter) + "/" + str(p.length))
+        print("Loading \"" + str(yt.title) + "\" " + str(counter) + "/" + str(p.length), flush=True)
         album_path = "".join(c for c in album if c not in special_characters) 
         author_path = "".join(c for c in yt.author if c not in special_characters)
         outpath = str(path) + "\\" + author_path + "\\" +  album_path
         yt.streams.get_by_itag(251).download(output_path=outpath)
     if counter < p.length:
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", flush=True)
+        print("    Processing stopped for " + album + " from " + artist, flush=True)
+        print("    The album does not seem to be complete!", flush=True)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", flush=True)
         continue
     if outformat != "none":
-        print("----------------------------------------------------------------------------------")
-        print("    Encoding *.webm files to " + args.format + ".")
-        print("    ")
-        print("----------------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------------", flush=True)
+        print("    Encoding *.webm files to " + args.format + ".", flush=True)
+        print("    ", flush=True)
+        print("----------------------------------------------------------------------------------", flush=True)
 
         threads = list()
         for file_path in os.listdir(outpath):
@@ -121,16 +124,16 @@ for url in urls:
                 thread.start()
         for x in threads:
             x.join()
-        print("Encoding done.")
+        print("Encoding done.", flush=True)
 
-    print("----------------------------------------------------------------------------------")
-    print("    Getting MusicBrainz album information.")
-    print("    ")
-    print("----------------------------------------------------------------------------------")
+    print("----------------------------------------------------------------------------------", flush=True)
+    print("    Getting MusicBrainz album information.", flush=True)
+    print("    ", flush=True)
+    print("----------------------------------------------------------------------------------", flush=True)
     mbz.set_useragent('test', '0.1')
     artist_list = mbz.search_artists(query=artist)['artist-list']
     art = artist_list[0] 
-    print("Selected artist id " + art['id'] + " from MB")
+    print("Selected artist id " + art['id'] + " from MB", flush=True)
     release_list = mbz.get_artist_by_id(art['id'],includes=["release-groups"], release_type=["album", "ep"])
     release_id = ""
     album_meta = ""
@@ -138,11 +141,12 @@ for url in urls:
     for release_group in release_list["artist"]["release-group-list"]:
         if similar(''.join(e for e in release_group['title'] if e.isalnum()), ''.join(e for e in album if e.isalnum())) > 0.6 and float(similar(''.join(e for e in release_group['title'] if e.isalnum()), ''.join(e for e in album if e.isalnum()))) > getHighest:
             getHighest = float(similar(''.join(e for e in release_group['title'] if e.isalnum()), ''.join(e for e in album if e.isalnum())))
-            print("Album match found for " + str(similar(''.join(e for e in release_group['title'] if e.isalnum()), ''.join(e for e in album if e.isalnum())) * 100) +"%")
+            print("Album match found for " + str(similar(''.join(e for e in release_group['title'] if e.isalnum()), ''.join(e for e in album if e.isalnum())) * 100) +"%", flush=True)
             album_meta = release_group['title']
             release_id = release_group['id']
     if album_meta == "":
-        sys.exit("no Album found")
+        print("no Album found. Skipping to next Download. Files will remain on disk.", flush=True)
+        continue
     if release_id != "":
         release_list = mbz.browse_releases(release_group=release_id)
         for rele in release_list['release-list']:
@@ -154,26 +158,26 @@ for url in urls:
     artist_meta = art['name']
     genre_meta = art['tag-list'][0]['name']
 
-    print("Metadata selected for album information :")
-    print("Artist: " + artist_meta)
-    print("Album: " + album_meta)
-    print("Release date: " + date_meta)
-    print("Genre: " + genre_meta)
+    print("Metadata selected for album information :", flush=True)
+    print("Artist: " + artist_meta, flush=True)
+    print("Album: " + album_meta, flush=True)
+    print("Release date: " + date_meta, flush=True)
+    print("Genre: " + genre_meta, flush=True)
 
-    print("----------------------------------------------------------------------------------")
-    print("    Setting meta tags.")
-    print("    ")
-    print("----------------------------------------------------------------------------------")
+    print("----------------------------------------------------------------------------------", flush=True)
+    print("    Setting meta tags.", flush=True)
+    print("    ", flush=True)
+    print("----------------------------------------------------------------------------------", flush=True)
     files =[]
     for file_path in os.listdir(outpath):
         if os.path.isfile(os.path.join(outpath, file_path)):
             if file_path.split(sep=".")[1] == fileext.replace(".",""):
                 files.append(file_path)
     for track in medium:
-        print(track['position'] + ". " + track['recording']['title'])
+        print(track['position'] + ". " + track['recording']['title'], flush=True)
         for file in files:
             if similar(file.split(sep=".")[0], track['recording']['title']) > 0.8:
-                print("     Matching file found " + str(similar(file.split(sep=".")[0], track['recording']['title'])*100) + "%")
+                print("     Matching file found " + str(similar(file.split(sep=".")[0], track['recording']['title'])*100) + "%", flush=True)
                 f = pathlib.Path(outpath+ "\\" + file)
                 add_metadata(
                     f,
@@ -190,7 +194,7 @@ for url in urls:
                     overwrite=True,
                     save_path=outpath + "\\" + track['position'] + " - " + artist_meta  + " - " + album_meta + " - " + track['recording']['title'] + f.suffix
                 )                    
-    print("----------------------------------------------------------------------------------")
-    print("    Done.")
-    print("    ")
-    print("##################################################################################")
+    print("----------------------------------------------------------------------------------", flush=True)
+    print("    Done.", flush=True)
+    print("    ", flush=True)
+    print("##################################################################################", flush=True)
