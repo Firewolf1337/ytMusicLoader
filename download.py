@@ -15,11 +15,11 @@ parser.add_argument('--format', '-f', help="Output format. Possible arguments no
 args = parser.parse_args()
 
 # If proxy is used uncomment this
-proxy = 'http://10.54.32.50:8080'
-os.environ['http_proxy'] = proxy 
-os.environ['HTTP_PROXY'] = proxy
-os.environ['https_proxy'] = proxy
-os.environ['HTTPS_PROXY'] = proxy
+#proxy = 'http://1.2.3.4:8080'
+#os.environ['http_proxy'] = proxy 
+#os.environ['HTTP_PROXY'] = proxy
+#os.environ['https_proxy'] = proxy
+#os.environ['HTTPS_PROXY'] = proxy
 
 
 path = pathlib.Path(__file__).parent.resolve()

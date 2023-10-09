@@ -5,11 +5,11 @@ import sys
 import argparse
 
 # If proxy is used uncomment this
-proxy = 'http://10.54.32.50:8080'
-os.environ['http_proxy'] = proxy 
-os.environ['HTTP_PROXY'] = proxy
-os.environ['https_proxy'] = proxy
-os.environ['HTTPS_PROXY'] = proxy
+#proxy = 'http://1.2.3.4:8080'
+#os.environ['http_proxy'] = proxy 
+#os.environ['HTTP_PROXY'] = proxy
+#os.environ['https_proxy'] = proxy
+#os.environ['HTTPS_PROXY'] = proxy
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--artist', '-a', help="Name of the Artist to search for the albums", type= str)
