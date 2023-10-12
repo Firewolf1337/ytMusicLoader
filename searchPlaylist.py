@@ -35,7 +35,7 @@ for art in search_results:
             print("\"" + album['title'] + "\" from Year " + str(album['year']) + " with " + str(album['trackCount']) + " Songs", flush=True)
             albumPlaylistIds.append(ytmusic.get_album(art['browseId'])['audioPlaylistId'])
         else:
-            print("!!!! Skipping \"" + album['title'] + "\" from Year " + str(album['year']) + " because it is not relead completely !!!!!", flush=True)
+            print("!!!! Skipping \"" + album['title'] + "\" from Year " + str(album['year']) + " because it is not released completely !!!!!", flush=True)
 with open(str(path) + '\\playlists.txt', args.writemode) as Playlists:
     for id in albumPlaylistIds:
         Playlists.write("https://music.youtube.com/playlist?list=" + id + "\n")

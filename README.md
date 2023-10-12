@@ -4,10 +4,10 @@
 1. Install Python 3
 1. Install pip - ```py -m ensurepip --upgrade```
 1. Install prerequisites - ```py .\prereq.py```
-1. Download [ffmpeg](https://github.com/BtbN/FFmpeg-Builds/releases) and extract atleast the bin folder to a ffmpeg folder where the python files are.
+1. Download [ffmpeg](https://github.com/BtbN/FFmpeg-Builds/releases) and extract at least the bin folder to a ffmpeg folder where the python files are.
 1. Or just install it and make sure it is available in the cmd otherwise add it to $PATH 
 
-### Folder structure should atleast look like this:
+### Folder structure should at least look like this:
 ```
 ytMusicLoader/
 ├── ffmpeg/
@@ -29,7 +29,7 @@ Either run - ```py .\download.py -l https://music.youtube.com/playlist?list=XXXX
 or put the link in the playlists.txt and just run ```py .\download.py```  
 Format can be as is [none], mp3 or flac.
 
-**_For multiple link downloads put the links behind```.\download.py -l``` seperated by a whitespace and surroundet by quotes or put every link in a new line in the playlists.txt._** 
+**_For multiple link downloads put the links behind```.\download.py -l``` separated by a whitespace and surrounded by quotes or put every link in a new line in the playlists.txt._** 
 
 ```
 usage: download.py [-h] [--links LINKS] [--format FORMAT]

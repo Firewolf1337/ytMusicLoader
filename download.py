@@ -10,7 +10,7 @@ import argparse
 from typing import Dict
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--links', '-l', help="Playlist links. Can be whitespace seperated", type= str)
+parser.add_argument('--links', '-l', help="Playlist links. Can be whitespace separated", type= str)
 parser.add_argument('--format', '-f', help="Output format. Possible arguments none, mp3 or flac", type= str, default= "mp3", choices=['flac', 'mp3', 'none'])
 args = parser.parse_args()
 
