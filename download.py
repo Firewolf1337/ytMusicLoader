@@ -32,7 +32,7 @@ else:
     with open(str(path) + '\\playlists.txt', "r") as Playlists:
         urls = Playlists.readlines()
 
-ffmpegpath = "\"" + str(path) + "\\ffmpeg\\bin\\ffmpeg.exe\" " 
+ffmpegpath = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe " 
 if subprocess.getstatusoutput('ffmpeg')[0] == 1:
     ffmpegpath = "ffmpeg "
 
@@ -118,7 +118,7 @@ for url in urls:
         threads = list()
         for file_path in os.listdir(outpath):
             if os.path.isfile(os.path.join(outpath, file_path)) and file_path.endswith("webm"):
-                subpr = ffmpegpath +  "-i \"" + outpath + "\\" + file_path + "\" "+ outformat + " \"" + outpath + "\\" + file_path.replace(".webm", fileext) +"\""
+                subpr = "\"" + ffmpegpath +  " \"-i \"" + outpath + "\\" + file_path + "\" "+ outformat + " \"" + outpath + "\\" + file_path.replace(".webm", fileext) +"\""
                 thread = threading.Thread(target=encode, args=(subpr, file_path, outpath + "\\" + file_path, ))
                 threads.append(thread)
                 thread.start()
