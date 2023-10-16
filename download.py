@@ -32,7 +32,7 @@ else:
     with open(str(path) + '\\playlists.txt', "r") as Playlists:
         urls = Playlists.readlines()
 
-ffmpegpath = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe " 
+ffmpegpath = "\"" + str(path) + "\\ffmpeg\\bin\\ffmpeg.exe\" " 
 if subprocess.getstatusoutput('ffmpeg')[0] == 1:
     ffmpegpath = "ffmpeg "
 
