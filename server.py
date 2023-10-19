@@ -29,6 +29,13 @@ def run_download():
     
     process.wait()
 
+def run_single(playlist, format):
+    command = ["py", "download.py", "-l", playlist, "-f", format]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    for line in process.stdout:
+        socketio.emit('output', line.strip())
+    process.wait()
+
 @socketio.on('run_search')
 def handle_run_search(data):
     search_text = data['search_text']
@@ -37,6 +44,12 @@ def handle_run_search(data):
 @socketio.on('run_download')
 def handle_run_download():
     threading.Thread(target=run_download).start()
+
+@socketio.on('run_single')
+def handle_run_single(data):
+    playlist = data['playlist']
+    format = data['format']
+    threading.Thread(target=run_single, args=(playlist,format,)).start()
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

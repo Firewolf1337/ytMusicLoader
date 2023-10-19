@@ -5,16 +5,32 @@
 </head>
 <body>
     <h1>ytMusicLoader</h1>
-    
-    <form>
-        <label for="search_text">Enter artist name to search album playlists:</label>
-        <input type="text" id="search_text" name="search_text">
-        <button type="button" onclick="runSearch()">Fetch Playlists</button>
-    </form>
-    
+    <div>
+    <h3>Search all Albums for an Artist:</h3>
+    <label for="search_text">Enter artist name to search album playlists:</label>
+    <br>
+    <input type="text" id="search_text" name="search_text">
+    <br>
+    <button type="button" onclick="runSearch()">Fetch Playlists</button>
     <button type="button" onclick="runDownload()">Download</button>
-    
-
+    </div>
+    <hr>
+    <div>
+        <h3>Download a single Playlist:</h3>
+        <label for="playlist">Enter playlist URL:</label>
+        <br>
+        <input type="text" id="playlist" name="playlist">
+        <h4>Convert to:</h4>
+        <label for="mp3">MP3:</label> 
+        <input type="radio" id="mp3" name="format" value="mp3" checked>
+        <label for="flac">FLAC:</label>
+        <input type="radio" id="flac" name="format" value="flac">
+        <label for="none">none:</label>
+        <input type="radio" id="none" name="format" value="none">
+        <br>
+        <button type="button" onclick="runSingle()">Download</button>
+    </div>
+    <hr>
     <h2>Output:</h2>
     <pre id="output"></pre>
     
@@ -40,6 +56,12 @@
             socket.emit('run_download');
         }
 
+        function runSingle() {
+            clearOutput();
+            const playlist = document.getElementById("playlist").value;
+            const format = document.querySelector('input[name="format"]:checked').value; ;
+            socket.emit('run_single', { playlist: playlist, format: format });
+        }
         function clearOutput() {
             outputElement.innerHTML = ""; // Clear the content of the <pre> element
             }
