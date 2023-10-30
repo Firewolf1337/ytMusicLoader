@@ -33,9 +33,13 @@ else:
         urls = Playlists.readlines()
 
 ffmpegpath = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe " 
-if subprocess.getstatusoutput('ffmpeg')[0] == 1:
-    subprocess.call('').re
-    ffmpegpath = "ffmpeg "
+if os.name == 'nt':
+    print("OS Windows")
+    if os.getenv('PATH').__contains__('ffmpeg'):
+        ffmpegpath = "ffmpeg "
+else:
+    if subprocess.getstatusoutput('ffmpeg')[0] == 1:
+        ffmpegpath = "ffmpeg "
 
 def add_metadata(file: pathlib.Path,
                  meta: Dict[str, str],
