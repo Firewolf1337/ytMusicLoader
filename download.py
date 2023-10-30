@@ -34,6 +34,7 @@ else:
 
 ffmpegpath = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe " 
 if subprocess.getstatusoutput('ffmpeg')[0] == 1:
+    subprocess.call('').re
     ffmpegpath = "ffmpeg "
 
 def add_metadata(file: pathlib.Path,
@@ -96,7 +97,7 @@ for url in urls:
     print("    to \"" +  str(path) + "\\" + artist + "\\" + album + "\"", flush=True)
     print("----------------------------------------------------------------------------------", flush=True)
     album_path = "".join(c for c in album if c not in special_characters) 
-    author_path = "".join(c for c in yt.author if c not in special_characters)
+    author_path = "".join(c for c in artist if c not in special_characters)
     outpath = str(path) + "\\" + author_path + "\\" +  album_path
     counter = 0
     for yt in p.videos:
