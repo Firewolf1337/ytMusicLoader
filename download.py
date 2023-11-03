@@ -26,14 +26,15 @@ path = pathlib.Path(__file__).parent.resolve()
 urls = []
 fileext = ""
 outformat= ""
-if args.links != None:
+if args.links:
     urls = args.links.split(" ")
 else:
-    with open(str(path) + '\\playlists.txt', "r") as Playlists:
+    with open(os.path.join(path, "playlists.txt"), "r") as Playlists:
         urls = Playlists.readlines()
 
-ffmpegpath = str(path) + "\\ffmpeg\\bin\\ffmpeg.exe " 
+
 if os.name == 'nt':
+    ffmpegpath = "\"" + str(os.path.join(path, 'ffmpeg','bin','ffmpeg.exe')) + "\" "
     print("OS Windows")
     if os.getenv('PATH').__contains__('ffmpeg'):
         ffmpegpath = "ffmpeg "
@@ -48,23 +49,14 @@ def add_metadata(file: pathlib.Path,
     if not save_path:
         save_path = file.with_suffix('.metadata' + file.suffix)
 
-    metadata_args = []
+    metadata_args = ""
     for k, v in meta.items():
-        metadata_args.extend([
-            '-metadata', f'{k}={v}'
-        ])
+        metadata_args = metadata_args + " -metadata " + f"\"{k}={v}\""
 
-    args = [
-        ffmpegpath,
-        '-v', 'quiet',
-        '-i', str(file.absolute()),
-        *metadata_args,
-        '-c', 'copy',
-        str(save_path)
-    ]
+    args = ffmpegpath + "-v quiet -i \"" + str(file.absolute()) + "\"" + metadata_args + " -c copy \"" + str(save_path) + "\""
     if overwrite:
-        args.append('-y')
-    proc = subprocess.run(args, stdout=subprocess.PIPE)
+        args = args + " -y"
+    proc = subprocess.run(args, stdout=subprocess.PIPE, shell=True)
     proc.check_returncode()
     os.remove(file)
 
@@ -89,20 +81,22 @@ def similar(a, b):
 
 def encode(param, name, inputfile):
     print("Start encoding ", name, flush=True)
-    subprocess.call(param)
+    subprocess.call(param, shell=True)
     os.remove(inputfile)
 
 for url in urls:
+    if not url:
+        continue 
     p = Playlist(url=url)
     album = (p.title).replace('Album - ', '')
     artist = (p.videos[0]).author
-    print("##################################################################################", flush=True)
-    print("    Downloading " + album + " from " + artist, flush=True)
-    print("    to \"" +  str(path) + "\\" + artist + "\\" + album + "\"", flush=True)
-    print("----------------------------------------------------------------------------------", flush=True)
     album_path = "".join(c for c in album if c not in special_characters) 
     author_path = "".join(c for c in artist if c not in special_characters)
-    outpath = str(path) + "\\" + author_path + "\\" +  album_path
+    outpath = os.path.join(path, 'downloads', author_path, album_path)
+    print("##################################################################################", flush=True)
+    print("    Downloading " + album + " from " + artist, flush=True)
+    print("    to \"" +  str(outpath) + "\"", flush=True)
+    print("----------------------------------------------------------------------------------", flush=True)
     counter = 0
     for yt in p.videos:
         counter = counter + 1
@@ -123,8 +117,9 @@ for url in urls:
         threads = list()
         for file_path in os.listdir(outpath):
             if os.path.isfile(os.path.join(outpath, file_path)) and file_path.endswith("webm"):
-                subpr = "\"" + ffmpegpath +  " \"-i \"" + outpath + "\\" + file_path + "\" "+ outformat + " \"" + outpath + "\\" + file_path.replace(".webm", fileext) +"\""
-                thread = threading.Thread(target=encode, args=(subpr, file_path, outpath + "\\" + file_path, ))
+                fpath = os.path.join(outpath, file_path)
+                subpr = str(ffmpegpath) +  "-i \"" + fpath + "\" "+ outformat + " \"" + fpath .replace(".webm", fileext) +"\""
+                thread = threading.Thread(target=encode, args=(subpr, file_path, fpath, ))
                 threads.append(thread)
                 thread.start()
         for x in threads:
@@ -183,7 +178,8 @@ for url in urls:
         for file in files:
             if similar(file.split(sep=".")[0], track['recording']['title']) > 0.8:
                 print("     Matching file found " + str(similar(file.split(sep=".")[0], track['recording']['title'])*100) + "%", flush=True)
-                f = pathlib.Path(outpath+ "\\" + file)
+                fpath = os.path.join(outpath, file)
+                f = pathlib.Path(fpath)
                 add_metadata(
                     f,
                     meta=dict(
@@ -197,7 +193,7 @@ for url in urls:
                         Tracknumber=track['position'],
                     ),
                     overwrite=True,
-                    save_path=outpath + "\\" + track['position'] + " - " + artist_meta  + " - " + album_meta + " - " + track['recording']['title'] + f.suffix
+                    save_path=os.path.join(outpath, track['position'] + " - " + artist_meta  + " - " + album_meta + " - " + track['recording']['title'] + f.suffix)
                 )                    
     print("----------------------------------------------------------------------------------", flush=True)
     print("    Done.", flush=True)
