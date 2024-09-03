@@ -1,4 +1,4 @@
-from pytube import YouTube,Playlist
+from pytubefix import YouTube,Playlist
 import pathlib
 import sys
 import subprocess
@@ -20,6 +20,7 @@ args = parser.parse_args()
 #os.environ['HTTP_PROXY'] = proxy
 #os.environ['https_proxy'] = proxy
 #os.environ['HTTPS_PROXY'] = proxy
+
 
 
 path = pathlib.Path(__file__).parent.resolve()
