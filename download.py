@@ -102,7 +102,10 @@ for url in urls:
     for yt in p.videos:
         counter = counter + 1
         print("Loading \"" + str(yt.title) + "\" " + str(counter) + "/" + str(p.length), flush=True)
-        yt.streams.get_by_itag(251).download(output_path=outpath)
+        try:
+            yt.streams.get_by_itag(251).download(output_path=outpath)
+        except:
+            print("Something wrong with the stream of track " + str(yt.title))
     if counter < p.length:
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", flush=True)
         print("    Processing stopped for " + album + " from " + artist, flush=True)
@@ -176,6 +179,7 @@ for url in urls:
                 files.append(file_path)
     for track in medium:
         print(track['position'] + ". " + track['recording']['title'], flush=True)
+        title_path = "".join(c for c in track['recording']['title'] if c not in special_characters)
         for file in files:
             if similar(file.split(sep=".")[0], track['recording']['title']) > 0.8:
                 print("     Matching file found " + str(similar(file.split(sep=".")[0], track['recording']['title'])*100) + "%", flush=True)
@@ -194,7 +198,7 @@ for url in urls:
                         Tracknumber=track['position'],
                     ),
                     overwrite=True,
-                    save_path=os.path.join(outpath, track['position'] + " - " + artist_meta  + " - " + album_meta + " - " + track['recording']['title'] + f.suffix)
+                    save_path=os.path.join(outpath, track['position'] + " - " + artist_meta  + " - " + album_meta + " - " + title_path + f.suffix)
                 )                    
     print("----------------------------------------------------------------------------------", flush=True)
     print("    Done.", flush=True)
