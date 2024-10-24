@@ -22,7 +22,6 @@ args = parser.parse_args()
 #os.environ['HTTPS_PROXY'] = proxy
 
 
-
 path = pathlib.Path(__file__).parent.resolve()
 urls = []
 fileext = ""
@@ -94,6 +93,7 @@ for url in urls:
     album_path = "".join(c for c in album if c not in special_characters) 
     author_path = "".join(c for c in artist if c not in special_characters)
     outpath = os.path.join(path, 'downloads', author_path, album_path)
+    pathlib.Path(outpath).mkdir(parents=True, exist_ok=True)
     print("##################################################################################", flush=True)
     print("    Downloading " + album + " from " + artist, flush=True)
     print("    to \"" +  str(outpath) + "\"", flush=True)
